@@ -4,13 +4,18 @@ services:
     image: mysql:8.0
     platform: linux/amd64
     container_name: mysql_container
-    command:
-      - "--default-authentication-plugin=mysql_native_password"
+    command: >
+      sh -c "
+      mysql_install_db &&
+      mysqld --init-file=/docker-entrypoint-initdb.d/database_scheme.sql --default-authentication-plugin=mysql_native_password
+      "
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_DATABASE=codetest
-      - MYSQL_USER=codetest
-      - MYSQL_PASSWORD=swordfish
+      - MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+      - MYSQL_USER=${{ secrets.MYSQL_USER }}
+      - MYSQL_PASSWORD=${{ secrets.MYSQL_USER }}
+    volumes:
+      - ./database_scheme.sql:/docker-entrypoint-initdb.d/database_scheme.sql
     ports:
       - "3306:3306"
     restart: always
