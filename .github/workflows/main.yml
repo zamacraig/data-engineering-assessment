@@ -1,4 +1,4 @@
-name: Docker Compose Pipeline with V2 Plugin
+name: Docker Compose Pipeline
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
       # Step 4: Run SQL Script on the database
       - name: Run SQL Script on Database
         run: |
-          docker exec -i mysql_container mysql -ucodetest -pswordfish codetest < database_scheme.sql
+          docker exec -i mysql_container mysql -ucodetest -pswordfish codetest < ./database_scheme.sql
 
       # Step 5: Run the process-files service
       - name: Run Process Files Service
