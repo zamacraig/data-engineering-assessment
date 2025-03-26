@@ -1,0 +1,44 @@
+name: Docker Compose Pipeline
+
+on:
+  push:
+    branches:
+      - automation
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Docker
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      # Step 3: Spin up the database service
+      - name: Start Database Service
+        run: |
+          docker-compose -f docker-compose.yml up -d database
+          sleep 15  # Wait for the database to initialize
+
+      # Step 4: Run SQL Script on the database
+      - name: Run SQL Script on Database
+        run: |
+          docker exec -i mysql_container mysql -ucodetest -pswordfish codetest < sql_script.sql
+
+      # Step 5: Run the process-files service
+      - name: Run Process Files Service
+        run: |
+          docker-compose -f docker-compose.yml run --rm process-files
+
+      # Step 6: Run the summarize-tables service
+      - name: Run Summarize Tables Service
+        run: |
+          docker-compose -f docker-compose.yml run --rm summarize-tables
+
+      # Step 7: Shut down all services
+      - name: Shut Down Services
+        run: docker-compose -f docker-compose.yml down
