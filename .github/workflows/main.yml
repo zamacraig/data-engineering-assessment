@@ -39,6 +39,6 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml run --rm summarize-tables
 
-      # Step 7: Shut down all services
+      # Step 7: Shut down all services 
       - name: Shut Down Services
         run: docker-compose -f docker-compose.yml down
