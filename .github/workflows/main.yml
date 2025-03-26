@@ -33,6 +33,13 @@ jobs:
           docker cp ./database_scheme.sql mysql_container:/sql_script.sql
         # Replace `./path/to/sql_script.sql` with the path to your SQL script in the repository
 
+      - name: Wait for MySQL to be Ready
+        run: |
+          until docker exec mysql_container mysqladmin ping -ucodetest -pswordfish --silent; do
+            echo "Waiting for MySQL to be ready..."
+            sleep 5
+          done
+
       # Step 5: Run SQL Script on the Database
       - name: Run SQL Script on Database
         run: |
