@@ -27,22 +27,27 @@ jobs:
           docker compose -f docker-compose.yml up -d database
           sleep 15  # Wait for the database to initialize
 
-      # Step 4: Run SQL Script on the database
+      # Step 4: Copy SQL File into the Docker Container
+      - name: Copy SQL File to Docker
+        run: |
+          docker cp ./database_scheme.sql mysql_container:/sql_script.sql
+        # Replace `./path/to/sql_script.sql` with the path to your SQL script in the repository
+
+      # Step 5: Run SQL Script on the Database
       - name: Run SQL Script on Database
         run: |
-          ls
-      # docker exec -i mysql_container mysql -ucodetest -pswordfish codetest < ./database_scheme.sql
+          docker exec -i mysql_container mysql -ucodetest -pswordfish codetest < database_scheme.sql
 
-      # Step 5: Run the process-files service
+      # Step 6: Run the process-files service
       - name: Run Process Files Service
         run: |
           docker compose -f docker-compose.yml run --rm process-files
 
-      # Step 6: Run the summarize-tables service
+      # Step 7: Run the summarize-tables service
       - name: Run Summarize Tables Service
         run: |
           docker compose -f docker-compose.yml run --rm summarize-tables
 
-      # Step 7: Shut down all services
+      # Step 8: Shut down all services
       - name: Shut Down Services
         run: docker compose -f docker-compose.yml down
