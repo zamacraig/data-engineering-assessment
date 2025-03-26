@@ -1,9 +1,9 @@
-version: "3.7"
-
 services:
+
   database:
     image: mysql:8.0
     platform: linux/amd64
+    container_name: mysql_container
     command:
       - "--default-authentication-plugin=mysql_native_password"
     environment:
@@ -15,45 +15,18 @@ services:
       - "3306:3306"
     restart: always
 
-  example-c:
-    image: example-c
-    build: images/example-c
-    command: ["./example"]
+  process-files:
+    image: process-files
+    container_name: process-files
+    build: images/process-files
+    command: ["python", "process-files.py"]
     volumes:
       - ./data:/data
 
-  example-node:
-    image: example-node
-    build: images/example-node
-    command: ["./example.js"]
-    volumes:
-      - ./data:/data
-
-  example-python:
-    image: example-python
-    build: images/example-python
-    command: ["./example.py"]
-    volumes:
-      - ./data:/data
-
-  example-r:
-    image: example-r
-    build: images/example-r
-    command: ["./example.R"]
-    volumes:
-      - ./data:/data
-
-  example-ruby:
-    image: example-ruby
-    build: images/example-ruby
-    command: ["./example.rb"]
-    volumes:
-      - ./data:/data
-
-  example-swift:
-    image: example-swift
-    platform: linux/amd64
-    build: images/example-swift
-    command: ["swift", "run"]
+  summarize-tables:
+    image: summarize-tables
+    container_name: summarize-tables
+    build: images/summarize-tables
+    command: ["python", "summarize-tables.py"]
     volumes:
       - ./data:/data
