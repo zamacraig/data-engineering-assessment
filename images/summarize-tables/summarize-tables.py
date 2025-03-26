@@ -1,21 +1,23 @@
 #!/usr/bin/envpython
 
-import csv
 import json
-import sqlalchemy
+import pandas as pd
+from sqlalchemy import create_engine
 
-# connect to the database
-engine = sqlalchemy.create_engine("mysql://codetest:swordfish@database/codetest")
-connection = engine.connect()
+# Create your SQLAlchemy engine
+engine = create_engine("mysql://codetest:swordfish@database/codetest")
 
-metadata = sqlalchemy.schema.MetaData(engine)
-
-# output the table to a JSON file
+# Use a connection from the engine
 with engine.connect() as connection:
-  query = "SELECT plc.city, count(ppl.given_name) FROM codetest.places plc LEFT JOIN codetest.people ppl ON plc.city = ppl.place_of_birth GROUP BY plc.city;"
-  results = connection.execute(query)
-  
-with open("/data/summary_output.json", "w") as json_file:
-  rows = {result[0] : result[1] for result in results}
-  print(rows)
-  json.dump(rows, json_file)
+    # Read the table directly into a DataFrame without explicit SQL queries
+    df_people = pd.read_sql_table(table_name='people', con=connection)
+    df_places = pd.read_sql_table(table_name='places', con=connection)
+    result = pd.merge(df_people, df_places, left_on='place_of_birth', right_on='city', how='inner')
+    summary = result.groupby('country').size().reset_index(name='count')
+    
+    # Convert the DataFrame into the desired JSON format
+    json_data = dict(zip(summary['country'], summary['count']))
+
+    # Dump the JSON data into a file
+    with open('/data/summary_output.json', 'w') as json_file:
+        json.dump(json_data, json_file)

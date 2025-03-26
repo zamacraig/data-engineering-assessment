@@ -1,28 +1,20 @@
 #!/usr/bin/envpython
+   
+import pandas as pd
+from sqlalchemy import create_engine
 
-import csv
-import sqlalchemy
+# Read the CSV file into a DataFrame
+df_places = pd.read_csv('/data/places.csv')
+df_people = pd.read_csv('/data/people.csv')
 
-# connect to the database
-engine = sqlalchemy.create_engine("mysql://codetest:swordfish@database/codetest")
-connection = engine.connect()
+# Create your SQLAlchemy engine
+engine = create_engine("mysql://codetest:swordfish@database/codetest")
 
-metadata = sqlalchemy.schema.MetaData(engine)
+# Insert DataFrame into MySQL table
+place_table = 'places'
+people_table = 'people'
 
-people = sqlalchemy.schema.Table('people', metadata, autoload=True, autoload_with=engine)
-
-places = sqlalchemy.schema.Table('places', metadata, autoload=True, autoload_with=engine)
-
-# read the CSV data file into the table
-with open('/data/places.csv') as csv_file:
-  reader = csv.reader(csv_file)
-  next(reader)
-  for row in reader: 
-    connection.execute(places.insert().values(city = row[0], county = row[1], country = row[2]))
-    
-# read the CSV data file into the table
-with open('/data/people.csv') as csv_file:
-  reader = csv.reader(csv_file)
-  next(reader)
-  for row in reader: 
-    connection.execute(people.insert().values(given_name = row[0], family_name = row[1], date_of_birth = row[2], place_of_birth = row[3]))
+# Use a connection from the engine
+with engine.connect() as connection:
+    df_places.to_sql(name=place_table, con=connection, if_exists='append', index=False)
+    df_people.to_sql(name=people_table, con=connection, if_exists='append', index=False)
