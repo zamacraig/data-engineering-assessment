@@ -30,7 +30,7 @@ jobs:
       # Step 4: Copy SQL File into the Docker Container
       - name: Copy SQL File to Docker
         run: |
-          docker cp database_scheme.sql mysql_container:/sql_script.sql
+          docker cp ./database_scheme.sql mysql_container:/sql_script.sql
         # Replace `./path/to/sql_script.sql` with the path to your SQL script in the repository
 
       # Step 5: Run SQL Script on the Database
