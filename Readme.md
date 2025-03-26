@@ -96,12 +96,8 @@ docker compose run --no-TTY database mysql --host=database --user=codetest --pas
 Then make sure that the containers have been built with `docker compose build` and run one or more of the sample programmes with:
 
 ```
-docker compose run example-c
-docker compose run example-node
-docker compose run example-python
-docker compose run example-r
-docker compose run example-ruby
-docker compose run example-swift
+docker compose run process-files
+docker compose run summarize-tables
 ```
 
 In each case, the programme loads data from the data/example.csv file into that table, and exports data from the database table to a JSON file in the data folder. Note that the scripts do not truncate the table, so each one you run will add additional content.
